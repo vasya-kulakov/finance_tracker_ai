@@ -16,5 +16,5 @@ class DataBase:
     def delete(self, data):
         self.base.remove(data)
 
-    def ___repr__(self):
+    def ___str__(self):
         return self.base

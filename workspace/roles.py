@@ -7,6 +7,7 @@ class Parent(BaseModel):
     role: str = 'Parent'
     name: str
     last_name: Optional[str]
+    password: str 
     
 
 
@@ -16,5 +17,5 @@ class Children(BaseModel):
     role: str = 'Child'
     name: str
     last_name: Optional[str]
-
+    password: str
 

@@ -1,21 +1,19 @@
 from pydantic import BaseModel
-from typing import Optional, Tuple
+from typing import Optional
 
 class Parent(BaseModel):
     '''ID i add until the moment integration with PostGres'''
     id: int 
-    role: str = 'Parent'
     name: str
     last_name: Optional[str]
-    password: str 
-    
-
+    password: str
+        
 
 class Children(BaseModel):
     '''ID i add until the moment integration with PostGres'''
     id: int
-    role: str = 'Child'
     name: str
     last_name: Optional[str]
     password: str
+    parent_id: int
 

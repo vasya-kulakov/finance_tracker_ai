@@ -1,4 +1,16 @@
-#Я думаю, для чистоты кода лучше вынести ее в отдельный класс и файл, как тут и обращаться через from import
+#Я думаю, для чистоты кода лучше вынести ее в отдельный класс и файл, как тут и обращаться через import
 
 class Docs:
-    pass 
+    parent_docs_json_format = {
+        'id': 1,
+        "name": "John",
+        "last_name": "Doe",
+        "password": "securepassword"
+    }
+    child_docs_json_format = {
+        'id': 2,
+        "name": "Jane",
+        "last_name": "Doe",
+        "password": "securepassword",
+        'parent_id': 1
+    }

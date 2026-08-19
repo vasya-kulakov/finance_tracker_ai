@@ -1,18 +1,19 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from workspace.config import settings
 
-DATABASE_URL = 'postgresql+asyncpg://admin:admin@127.0.0.1:5432/finance_db'
+DATABASE_URL = settings.database_url
 
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(DATABASE_URL, echo=False)
 
-async_session = async_sessionmaker(
-    engine,
-    expire_on_commit=False,
+async_session_maker = async_sessionmaker(
+    bind=engine,
     class_=AsyncSession,
+    expire_on_commit=False,
 )
 
 
 async def get_session() -> AsyncSession:
-    """Dependency для FastAPI: Depends(get_session)"""
-    async with async_session() as session:
+    """FastAPI dependency: session = Depends(get_session)"""
+    async with async_session_maker() as session:
         yield session

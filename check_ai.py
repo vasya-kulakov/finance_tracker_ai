@@ -1,7 +1,11 @@
 from openai import OpenAI
+
+with open('apikeys.txt', 'r') as f:
+    key = f.read().strip()
+    
 client = OpenAI(
   base_url="https://api.zveno.ai/v1",
-  api_key="sk-Ii5t4t7OOmLtmY6H61grwljoQLKrfMu11evY3ZNIqbg",
+  api_key=key,
 )
 
 completion = client.chat.completions.create(

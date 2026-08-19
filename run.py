@@ -1,70 +1,92 @@
-from fastapi import FastAPI, Body, Path, HTTPException, status
-from workspace.docs import Docs
-from workspace.databaseconfig import DataBase
-from workspace.roles import *
+from decimal import Decimal
 from typing import Annotated
+
+from fastapi import Body, Depends, FastAPI, HTTPException, Path, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from workspace.database import get_session
+from workspace.docs import Docs
+from workspace.repository import UserRepository, WherePasswordException
+from workspace.roles import Children, Parent
 
 #####################
 app = FastAPI()     #
-db = DataBase()     # 
 #####################
+# db = DataBase()
 
 
 @app.get('/family')
-async def show_family():
+async def show_family(session: AsyncSession = Depends(get_session)):
+    repo = UserRepository(session)
+    family = await repo.get_all()
     return {
-        'family': db.base
+        'family': [user.to_dict() for user in family]
     }
 
+
 @app.put('/family/add_parent')
-async def add_parent(parent: Annotated[
-    Parent, 
-    Body(..., example=Docs.parent_docs_json_format)
-    ]):
-    parent = parent.model_dump()
-    parent['role'] = 'Parent'
-    db.add(parent)
+async def add_parent(
+    parent: Annotated[Parent, Body(..., example=Docs.parent_docs_json_format)],
+    session: AsyncSession = Depends(get_session),
+):
+    repo = UserRepository(session)
+    data = parent.model_dump()
+    data['role'] = 'PARENT'
+    created = await repo.add(data)
     return {
         "message": "Parent added successfully",
-        'family': db.base
-            }
+        "parent": created.to_dict(),
+    }
+
 
 @app.put('/family/add_child')
-async def add_child(child: Annotated[
-    Children,
-    Body(..., example=Docs.child_docs_json_format)
-    ]):
-    child = child.model_dump()
-    child['role'] = 'Child'
-    child['capital'] = 0
-    db.add(child)
+async def add_child(
+    child: Annotated[Children, Body(..., example=Docs.child_docs_json_format)],
+    session: AsyncSession = Depends(get_session),
+):
+    repo = UserRepository(session)
+    data = child.model_dump()
+    data['role'] = 'CHILD'
+    data['capital'] = 0
+    created = await repo.add(data)
     return {
         "message": "Child added successfully",
-        'family': db.base
+        "child": created.to_dict(),
     }
 
 
 @app.post('/family/{id_child}')
 async def add_child_capital(
-    id_child: Annotated[int, Path(..., title='Child id')], 
-    token: Annotated[str, Body(..., title='Password - need to password for id parent, who`s be in children info')], 
-    money: Annotated[int, Body(..., title='How much we get a child')]
-    ):
-    child = db.search(id_child)
-    if 'Error' in child:
-        if child['Error'] == 404:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, 
-                detail="Child id not found"
-            )
+    id_child: Annotated[int, Path(..., title='Child id')],
+    token: Annotated[str, Body(..., title='Password - need to password for id parent, who`s be in children info')],
+    money: Annotated[int, Body(..., title='How much we get a child')],
+    session: AsyncSession = Depends(get_session),
+):
+    repo = UserRepository(session)
 
+    child = await repo.search_child(id_child)
+    if child is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Child id not found",
+        )
 
-    if db.check_validated_password(child['parent_id'], token):
-        child['capital'] += money
-        db.add(child)
-        return {'msg': 'Capital was added succesfull', 'family': db.base}
-    else:
-        db.add(child)
-        return {'msg': 'Error parent password'}
+    try:
+        is_valid = await repo.check_validated_password(child.parent_id, token)
+    except WherePasswordException:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Parent has no password set",
+        )
 
-    
+    if not is_valid:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Error parent password",
+        )
+
+    updated = await repo.add_capital(id_child, Decimal(money))
+    return {
+        'msg': 'Capital was added successfully',
+        'child': updated.to_dict(),
+    }

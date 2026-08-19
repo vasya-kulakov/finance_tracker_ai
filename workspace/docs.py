@@ -2,13 +2,11 @@
 
 class Docs:
     parent_docs_json_format = {
-        'id': 1,
         "name": "John",
         "last_name": "Doe",
         "password": "securepassword"
     }
     child_docs_json_format = {
-        'id': 2,
         "name": "Jane",
         "last_name": "Doe",
         "password": "securepassword",

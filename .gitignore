@@ -5,8 +5,8 @@ __pycache__/
 venv/
 
 .env
-
+./finance_tracker_architecture.md
 .vscode/
 .idea/
 *.log
-apikeys.txt
+./apikeys.txt

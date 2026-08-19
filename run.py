@@ -4,10 +4,10 @@ from typing import Annotated
 from fastapi import Body, Depends, FastAPI, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from workspace.database import get_session
-from workspace.docs import Docs
-from workspace.repository import UserRepository, WherePasswordException
-from workspace.roles import Children, Parent
+from src.database import get_session
+from src.docs import Docs
+from src.repository import UserRepository, WherePasswordException
+from src.roles import Children, Parent
 
 #####################
 app = FastAPI()     #

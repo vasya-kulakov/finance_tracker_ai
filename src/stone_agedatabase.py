@@ -1,4 +1,3 @@
-from jwt import JWT, supported_key_types
 from typing import Dict
 
 class WherePasswordException(Exception):

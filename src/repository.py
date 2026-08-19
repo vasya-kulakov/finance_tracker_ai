@@ -6,24 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import RoleEnum, User
 
-MAX_PASSWORD_BYTES = 72  # физическое ограничение bcrypt
-
 
 class WherePasswordException(Exception):
-    """Бросается, когда у пользователя нет установленного пароля."""
     pass
 
-
-class PasswordTooLongException(Exception):
-    """Бросается, когда пароль длиннее 72 байт (лимит bcrypt)."""
-    pass
 
 
 def _hash_password(password: str) -> str:
-    if len(password.encode("utf-8")) > MAX_PASSWORD_BYTES:
-        raise PasswordTooLongException(
-            f"Password must be at most {MAX_PASSWORD_BYTES} bytes"
-        )
     hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
     return hashed.decode("utf-8")
 
@@ -33,16 +22,6 @@ def _verify_password(password: str, hashed_password: str) -> bool:
 
 
 class UserRepository:
-    """
-    Замена старому DataBase (list + dict в памяти) на репозиторий
-    поверх PostgreSQL через SQLAlchemy AsyncSession.
-
-    Использование в FastAPI:
-        async def endpoint(session: AsyncSession = Depends(get_session)):
-            repo = UserRepository(session)
-            ...
-    """
-
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -51,11 +30,7 @@ class UserRepository:
         return list(result.scalars().all())
 
     async def add(self, data: dict) -> User:
-        """
-        data: {"name": ..., "role": "PARENT"/"CHILD", "password": "..." (опционально)}
-        Пароль хешируется напрямую через bcrypt, а не встроенным hash().
-        """
-        data = dict(data)  # не мутируем то, что передал вызывающий код
+        data = dict(data)  
         password = data.pop("password", None)
 
         user = User(**data)

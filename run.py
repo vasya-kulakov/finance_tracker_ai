@@ -53,6 +53,11 @@ async def drop_tables():
         raise HTTPException(status_code=500, detail=f"Ошибка при удалении таблиц: {str(e)}")
 
 
+@app.get('/admin/maketest')
+async def make_tests():
+    '''Прогоняет тесты из папки tests'''
+    
+
 @app.put('/family/add_parent')
 async def add_parent(
     parent: Annotated[Parent, Body(..., example=Docs.parent_docs_json_format)],

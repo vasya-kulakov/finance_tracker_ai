@@ -1,11 +1,10 @@
 from decimal import Decimal
 
 import bcrypt
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .models import RoleEnum, User
-
 
 class WherePasswordException(Exception):
     pass
@@ -24,6 +23,12 @@ def _verify_password(password: str, hashed_password: str) -> bool:
 class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def clear_data(self) -> dict:
+        '''TRUNCATE All table'''
+        await self.session.execute(text("TRUNCATE TABLE users RESTART IDENTITY CASCADE;"))
+        await self.session.commit()
+        return {"msg": "All rows removed from users, id sequence reset to 1"}
 
     async def get_all(self) -> list[User]:
         result = await self.session.execute(select(User))

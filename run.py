@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import Body, Depends, FastAPI, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import get_session
+from src.database import get_session, create_all_tables, drop_all_tables, reset_database
 from src.docs import Docs
 from src.repository import UserRepository, WherePasswordException
 from src.roles import Children, Parent
@@ -16,13 +16,41 @@ app = FastAPI()     #
 
 # Help Me please !!!
 
+@app.get('/')
+async def welcome_to_finance_tracker(session: AsyncSession = Depends(get_session)):
+    return {
+        'msg': 'welcome to my finance tracker. '
+        'This project is only backend part of app. For use API I will recommended use a /docs path',
+        'main_page': 1
+    }
+
 @app.get('/family')
 async def show_family(session: AsyncSession = Depends(get_session)):
+    
     repo = UserRepository(session)
     family = await repo.get_all()
     return {
         'family': [user.to_dict() for user in family]
     }
+
+@app.post("/admin/create_tables")
+async def create_tables():
+    """Создаёт все таблицы по текущим моделям (если их ещё нет)."""
+    try:
+        await create_all_tables()
+        return {"status": "success", "detail": "Таблицы созданы"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка при создании таблиц: {str(e)}")
+ 
+ 
+@app.post("/admin/drop_tables")
+async def drop_tables():
+    """Удаляет все таблицы (и связанные ENUM-типы)."""
+    try:
+        await drop_all_tables()
+        return {"status": "success", "detail": "Таблицы удалены"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка при удалении таблиц: {str(e)}")
 
 
 @app.put('/family/add_parent')

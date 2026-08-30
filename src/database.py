@@ -21,8 +21,6 @@ async def get_session() -> AsyncSession:
 async def create_all_tables() -> None:
     """
     Создаёт все таблицы (и связанные ENUM-типы) по текущим моделям.
-    Асинхронный engine не умеет create_all напрямую — нужен run_sync
-    через реальное соединение (engine.begin()).
     """
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

@@ -47,7 +47,7 @@ async def create_tables():
 async def r_database():
     '''Сбрасывает бд до заводских'''
     try:
-        reset_database()
+        await reset_database()
         return {'status': 'success', 'msg': 'Table was dropped and created'}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f'Error {str(e)}')

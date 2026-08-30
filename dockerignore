@@ -1,0 +1,12 @@
+.git
+.gitignore
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.env
+ai_part/apikeys.txt
+test_report.json
+README.md
+finance_tracker_architecture.md

@@ -7,6 +7,7 @@ async def test_connection_with_a_server(ac: AsyncClient):
     response = await ac.get('/')
     assert response.status_code == 200
 
+
 @pytest.mark.anyio
 async def test_reset_db(ac: AsyncClient):
     '''Сброс базы данных'''
@@ -26,7 +27,7 @@ async def test_add_parent(ac: AsyncClient):
         "last_name": "Doe",
         "password": "securepassword"
     })
-    res_json = response.json()  # <-- без await
+    res_json = response.json()
     correct_json = {
         "message": "Parent added successfully",
         "parent": {
@@ -37,4 +38,47 @@ async def test_add_parent(ac: AsyncClient):
                 "capital": 0,
                 "parent_id": None
     }}
+    assert res_json == correct_json
+
+
+@pytest.mark.anyio
+async def test_add_child(ac: AsyncClient):
+    response = await ac.put(url='/family/add_child', json={
+        "name": "Jane",
+        "last_name": "Doe",
+        "password": "securepassword",
+        'parent_id': 1
+    })
+    res_json = response.json()
+    correct_json = {"message": "Child added successfully",
+        'child': {
+            'id': 2,
+            "name": "Jane",
+            "last_name": "Doe",
+            'role': 'CHILD',
+            'capital': 0,
+            'parent_id': 1
+        }}
+
+    assert res_json == correct_json
+
+
+@pytest.mark.anyio
+async def test_add_capital_to_child(ac: AsyncClient):
+    response = await ac.post(url='/family/2', json={
+        'token': 'securepassword',  
+        'money': 100
+    })
+    res_json = response.json()
+    correct_json = {
+"msg": "Capital was added successfully",
+"child": {
+    "id": 2,
+    "name": "Jane",
+    "last_name": "Doe",
+    "role": "CHILD",
+    "capital": 100,
+    "parent_id": 1
+}
+}
     assert res_json == correct_json

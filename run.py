@@ -1,9 +1,12 @@
 from decimal import Decimal
 from typing import Annotated
 
-from fastapi import Body, Depends, FastAPI, HTTPException, Path, status
+from fastapi import Body, Depends, FastAPI, HTTPException, Path, status, BackgroundTasks
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
-
+import pytest
+import os
+import json
 from src.database import get_session, create_all_tables, drop_all_tables, reset_database
 from src.docs import Docs
 from src.repository import UserRepository, WherePasswordException
@@ -14,7 +17,69 @@ app = FastAPI()     #
 #####################
 # db = DataBase()
 
-# Help Me please !!!
+REPORT_FILE = "test_report.json"
+
+def run_pytest_proccess():
+    """Функция для запуска тестов и генерации JSON отчета"""
+    if os.path.exists(REPORT_FILE):
+        os.remove(REPORT_FILE)
+        
+    pytest.main([
+        "tests/",                 
+        f"--json-report", 
+        f"--json-report-file={REPORT_FILE}"
+    ])
+
+@app.post("/run-tests")
+async def start_tests(background_tasks: BackgroundTasks):
+    '''Запускает тесты на фоне и делает тестовую конфигурацию для бд.'''
+    background_tasks.add_task(run_pytest_proccess)
+    
+    return {
+        "status": "Тесты запущены в фоне",
+        "msg": "Отправьте GET запрос на /test-results через несколько секунд, чтобы получить конфигурацию и результат."
+    }
+
+REPORT_FILE = "test_report.json"
+
+def run_pytest_proccess():
+    """Функция для запуска тестов и генерации JSON отчета"""
+    if os.path.exists(REPORT_FILE):
+        os.remove(REPORT_FILE)
+        
+    pytest.main([
+        "tests/",               
+        f"--json-report", 
+        f"--json-report-file={REPORT_FILE}"
+    ])
+
+@app.post("/run-tests")
+async def start_tests(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_pytest_proccess)
+    
+    return {
+        "status": "Тесты запущены в фоне",
+        "msg": "Отправьте GET запрос на /test-results через несколько секунд, чтобы получить конфигурацию и результат."
+    }
+
+@app.get("/test-results")
+async def get_test_results():
+    if not os.path.exists(REPORT_FILE):
+        return JSONResponse(
+            status_code=202, 
+            content={"status": "Тесты все еще выполняются или еще не запускались"}
+        )
+        
+    with open(REPORT_FILE, "r", encoding="utf-8") as f:
+        report_data = json.load(f)
+        
+    return {
+        "status": "Выполнено",
+        "summary": report_data.get("summary"),
+        "tests": report_data.get("tests")     
+    }
+
+
 
 @app.get('/')
 async def welcome_to_finance_tracker(session: AsyncSession = Depends(get_session)):
@@ -61,11 +126,6 @@ async def drop_tables():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка при удалении таблиц: {str(e)}")
 
-
-@app.get('/admin/maketest')
-async def make_tests():
-    '''Прогоняет тесты из папки tests'''
-    
 
 @app.put('/family/add_parent')
 async def add_parent(

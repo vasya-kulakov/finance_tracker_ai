@@ -41,7 +41,16 @@ async def create_tables():
         return {"status": "success", "detail": "Таблицы созданы"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка при создании таблиц: {str(e)}")
- 
+
+
+@app.post('/admin/reset')
+async def r_database():
+    '''Сбрасывает бд до заводских'''
+    try:
+        reset_database()
+        return {'status': 'success', 'msg': 'Table was dropped and created'}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f'Error {str(e)}')
  
 @app.post("/admin/drop_tables")
 async def drop_tables():

@@ -23,7 +23,7 @@ Backend-приложение для семейного учёта финансо
 git clone https://github.com/vasya-kulakov/finance_tracker_ai.git
 cd finance_tracker_ai/finance_app
 
-cp .env.example .env
+cp Test.env.example .env
 # при необходимости поменяй DB_USER / DB_PASSWORD / DB_NAME в .env
 
 docker compose up --build

@@ -127,8 +127,7 @@ finance_app/
 ```
 
 ## Roadmap
-
-- [ ] Разбить `run.py` на отдельные роутеры (`auth`, `children`, `purchases`, `stats`)
+Done - Разбить `run.py` на отдельные роутеры (`auth`, `children`, `purchases`, `stats`)
 - [ ] JWT-авторизация и защита `/admin/*` эндпоинтов
 - [ ] Подключить AI-оценку покупок (`ai_part`) к основному API
 - [ ] Лимиты трат и учёт доходов семьи

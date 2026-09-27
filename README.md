@@ -20,11 +20,10 @@ Backend-приложение для семейного учёта финансо
 Понадобится Docker и Docker Compose.
 
 ```bash
-git clone https://github.com/vasya-kulakov/finance_tracker_ai.git
-cd finance_tracker_ai/finance_app
+cd finance_app
 
-cp Test.env.example .env
-# при необходимости поменяй DB_USER / DB_PASSWORD / DB_NAME в .env
+# В корне проекта уже должен быть файл .env
+# при необходимости отредактируйте DB_USER / DB_PASSWORD / DB_NAME
 
 docker compose up --build
 ```
@@ -33,15 +32,24 @@ docker compose up --build
 - API — http://localhost:8000
 - Интерактивная документация (Swagger) — http://localhost:8000/docs
 
-При первом запуске контейнер `app` сам дожидается готовности базы и накатывает миграции
-(`alembic upgrade head`) — руками ничего создавать не нужно.
+При первом запуске контейнер `app` сам ждёт готовность PostgreSQL и автоматически
+накатывает миграции (`alembic upgrade head`).
+
+Если контейнеры уже были собраны ранее и вы изменили `Dockerfile`/`entrypoint.sh`,
+пересоберите образ без кэша:
+
+```bash
+docker compose down --remove-orphans
+docker compose build --no-cache
+docker compose up
+```
 
 ### Если порт 5432 уже занят
 
 Если на компьютере уже стоит локальный PostgreSQL, порт 5432 может быть занят, и Docker
-не сможет пробросить его наружу — сама база и приложение при этом всё равно поднимутся
-и будут работать между собой внутри docker-сети. Если нужен доступ к базе с хоста
-(например, через DBeaver), поменяй проброс порта в `docker-compose.yml`:
+не сможет пробросить его наружу — база и приложение всё равно поднимутся внутри
+общей docker-сети. Если нужен доступ к базе с хоста, поменяй проброс порта в
+`docker-compose.yml`:
 
 ```yaml
     ports:
@@ -62,7 +70,7 @@ uvicorn run:app --reload
 
 ## Переменные окружения
 
-Файл `.env` в корне проекта (см. `.env.example`):
+Файл `.env` в корне проекта:
 
 | Переменная    | Описание                                       |
 |---------------|-------------------------------------------------|

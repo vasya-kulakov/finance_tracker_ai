@@ -1,0 +1,11 @@
+from fastapi import APIRouter
+from .admin import router as admin_router
+from .family import router as family_router
+from .test import router as test_router
+
+main_router = APIRouter()
+
+main_router.include_router(admin_router)
+main_router.include_router(family_router)
+main_router.include_router(test_router)
+

@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 # Единый источник правды для строки подключения — не дублируем её в alembic.ini
-from src.database import DATABASE_URL
-from src.models import Base
+from src.db.database import DATABASE_URL
+from src.db.models import Base
 
 config = context.config
 config.set_main_option("sqlalchemy.url", DATABASE_URL)

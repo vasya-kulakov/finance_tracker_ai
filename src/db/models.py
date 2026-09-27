@@ -44,3 +44,42 @@ class User(Base):
 
     def __repr__(self) -> str:
         return f"<User id={self.id} name={self.name!r} role={self.role}>"
+
+class Transaction(Base):
+    __tablename__ = 'transaction'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id_person: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE', onupdate='CASCADE'))
+    info: Mapped[str | None] = mapped_column(String(100), nullable=True)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "id_person": self.id_person,
+            "info": self.info,
+        }
+
+    def __repr__(self) -> str:
+        return f"<Transaction id={self.id} id_person={self.id_person}>"
+
+
+class Update_grade(Base):
+    __tablename__ = 'log_grade'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id_person: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    id_buy: Mapped[int] = mapped_column(ForeignKey('transaction.id', ondelete='CASCADE', onupdate='CASCADE'))
+    upgrade_grade: Mapped[float] = mapped_column(Numeric(10, 2))
+    more_info: Mapped[str | None] = mapped_column(String(100), nullable=True)
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "id_person": self.id_person,
+            "id_buy": self.id_buy,
+            "upgrade_grade": float(self.upgrade_grade) if self.upgrade_grade is not None else None,
+            "more_info": self.more_info,
+        }
+
+    def __repr__(self) -> str:
+        return f"<Update_grade id={self.id} id_person={self.id_person} id_buy={self.id_buy}>"

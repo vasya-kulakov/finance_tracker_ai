@@ -1,5 +1,7 @@
 from openai import OpenAI
 
+
+# create apikeys.txt before use this
 with open('apikeys.txt', 'r') as f:
     key = f.read().strip()
     

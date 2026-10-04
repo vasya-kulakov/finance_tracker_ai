@@ -39,5 +39,7 @@ class Settings(BaseSettings):
         )
 
 settings = Settings()
+
+#Для откладки и проверки, что все всё видят
 print(settings.database_url)
 print(settings.jwttoken)

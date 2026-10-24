@@ -1,9 +1,13 @@
 from fastapi import FastAPI
-
 from src.api import main_router
-
+from src.db.init_db import init_db
 app = FastAPI(title="Family Finance Tracker")
 app.include_router(main_router)
+
+
+@app.on_event("startup")
+async def startup_event():
+    await init_db()
 
 
 @app.get('/')

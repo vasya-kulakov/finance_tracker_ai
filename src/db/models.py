@@ -13,6 +13,7 @@ class Base(DeclarativeBase):
 class RoleEnum(str, enum.Enum):
     PARENT = "PARENT"
     CHILD = "CHILD"
+    ADMIN = "ADMIN"
 
 
 class User(Base):

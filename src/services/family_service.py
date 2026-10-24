@@ -33,13 +33,5 @@ class FamilyService:
         if child is None:
             raise ValueError("Child id not found")
 
-        try:
-            is_valid = await self.repo.check_validated_password(child.parent_id, token)
-        except WherePasswordException as exc:
-            raise ValueError("Parent has no password set") from exc
-
-        if not is_valid:
-            raise PermissionError("Error parent password")
-
         updated = await self.repo.add_capital(child_id, money)
         return updated.to_dict()

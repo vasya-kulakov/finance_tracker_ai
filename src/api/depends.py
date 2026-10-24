@@ -7,7 +7,8 @@ from src.db.database import get_session
 from src.db.models import User
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+
 
 
 async def get_user(token: str = Depends(oauth2_scheme), session: AsyncSession = Depends(get_session)) -> Optional[User]:
@@ -33,4 +34,9 @@ async def get_user(token: str = Depends(oauth2_scheme), session: AsyncSession = 
             detail='User not found',
             headers={'WWW-Authenticate': 'Bearer'},
         )
-    return user)
+    return user
+
+async def get_current_active_user(
+    current_user: User = Depends(get_user)
+) -> User:
+    return current_user

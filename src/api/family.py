@@ -8,7 +8,7 @@ from src.db.database import get_session
 from src.docs.docs import Docs
 from src.models.roles import Children, Parent
 from src.services.family_service import FamilyService
-
+from .depends import get_current_active_user
 router = APIRouter()
 
 
@@ -48,30 +48,20 @@ async def add_child(
 @router.post('/family/{id_child}')
 async def add_child_capital(
     id_child: Annotated[int, Path(..., title='Child id')],
-    token: Annotated[str, Body(..., title='Password - need to password for id parent, who`s be in children info')],
-    money: Annotated[int, Body(..., title='How much we get a child')],
+    current_user: Parent = Depends(get_current_active_user),
     session: AsyncSession = Depends(get_session),
+    money: Annotated[int, Path(..., title='Money', example=100)] = 100
 ):
     service = FamilyService(session)
 
     try:
-        updated = await service.add_capital(id_child, token, Decimal(money))
+        updated = await service.add_capital(id_child, current_user, Decimal(money))
     except ValueError as exc:
         if str(exc) == "Child id not found":
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Child id not found",
             ) from exc
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Parent has no password set",
-        ) from exc
-    except PermissionError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Error parent password",
-        ) from exc
-
     return {
         'msg': 'Capital was added successfully',
         'child': updated,

@@ -3,7 +3,6 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.db.database import get_session
 from src.docs.docs import Docs
 from src.models.roles import Children, Parent

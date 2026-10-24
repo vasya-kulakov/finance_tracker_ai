@@ -22,8 +22,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    role: Mapped[RoleEnum] = mapped_column(SAEnum(RoleEnum, name="role_enum"), nullable=False)
-
+    role: Mapped[RoleEnum] = mapped_column(SAEnum(RoleEnum, name="role_enum"))
     hashed_password: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     capital: Mapped[Decimal] = mapped_column(

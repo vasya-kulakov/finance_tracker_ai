@@ -25,7 +25,7 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('last_name', sa.String(length=100), nullable=True),
-    sa.Column('role', sa.Enum('PARENT', 'CHILD', name='role_enum'), nullable=False),
+    sa.Column('role', sa.Enum('PARENT', 'CHILD', 'ADMIN', name='role_enum'), nullable=False),
     sa.Column('hashed_password', sa.String(length=255), nullable=True),
     sa.Column('capital', sa.Numeric(precision=10, scale=2), server_default='0.00', nullable=False),
     sa.Column('parent_id', sa.Integer(), nullable=True),

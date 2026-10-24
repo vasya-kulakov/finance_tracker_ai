@@ -1,19 +1,25 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_session
-from models import User, RoleEnum
+import os
+from sqlalchemy import select
+import bcrypt
+from src.db.database import async_session_maker
+from src.db.models import User, RoleEnum
 
 
-async def init_db(session: AsyncSession = await get_session()):
-    '''Инициализация бд и создание администратора по умолчанию, если его нет.'''
-    q1 = session.execute("SELECT * FROM users WHERE role = ADMIN")
-    if q1 is None:
+async def init_db() -> None:
+    '''Создаёт администратора по умолчанию, если его нет.'''
+    async with async_session_maker() as session:
+        result = await session.execute(
+            select(User).where(User.role == RoleEnum.ADMIN).limit(1)
+        )
+        if result.scalar_one_or_none() is not None:
+            return
+
         admin = User(
-            name="Admin",
+            name='ADMIN',
             role=RoleEnum.ADMIN,
-            hashed_password="admin",  # Здесь можно использовать хеширование пароля
-            capital=0.00,
-            parent_id=None
+            hashed_password=bcrypt.hashpw("admin".encode(), bcrypt.gensalt()).decode('utf-8'),
+            capital=0,
+            parent_id=None,
         )
         session.add(admin)
         await session.commit()
-    

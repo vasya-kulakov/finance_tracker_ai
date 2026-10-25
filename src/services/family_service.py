@@ -28,7 +28,7 @@ class FamilyService:
         created = await self.repo.add(data)
         return created.to_dict()
 
-    async def add_capital(self, child_id: int, token: str, money: Decimal):
+    async def add_capital(self, child_id: int, money: Decimal):
         child = await self.repo.search_child(child_id)
         if child is None:
             raise ValueError("Child id not found")

@@ -12,3 +12,7 @@ class Docs:
         "password": "securepassword",
         'parent_id': 1
     }
+    admin_token_default = {
+        'name': 'ADMIN',
+        'password': 'admin'
+    }

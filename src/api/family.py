@@ -20,7 +20,7 @@ async def show_family(session: AsyncSession = Depends(get_session)):
 
 @router.put('/family/add_parent')
 async def add_parent(
-    parent: Annotated[Parent, Body(..., example=Docs.parent_docs_json_format)],
+    parent: Annotated[Parent, Body(..., examples=[Docs.parent_docs_json_format])],
     session: AsyncSession = Depends(get_session),
 ):
     service = FamilyService(session)
@@ -33,7 +33,7 @@ async def add_parent(
 
 @router.put('/family/add_child')
 async def add_child(
-    child: Annotated[Children, Body(..., example=Docs.child_docs_json_format)],
+    child: Annotated[Children, Body(..., examples=[Docs.child_docs_json_format])],
     session: AsyncSession = Depends(get_session),
 ):
     service = FamilyService(session)
@@ -49,12 +49,12 @@ async def add_child_capital(
     id_child: Annotated[int, Path(..., title='Child id')],
     current_user: Parent = Depends(get_current_active_user),
     session: AsyncSession = Depends(get_session),
-    money: Annotated[int, Path(..., title='Money', example=100)] = 100
+    money: Annotated[int, Path(..., title='Money', examples=[100])] = 100
 ):
     service = FamilyService(session)
 
     try:
-        updated = await service.add_capital(id_child, current_user, Decimal(money))
+        updated = await service.add_capital(id_child, Decimal(money))
     except ValueError as exc:
         if str(exc) == "Child id not found":
             raise HTTPException(

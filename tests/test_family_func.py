@@ -20,7 +20,7 @@ async def test_connection_with_a_server_404(ac: AsyncClient):
 @pytest.mark.anyio
 async def test_add_parent(ac: AsyncClient):
     '''Test adding a parent'''
-    response = await ac.post('/family/add_parent', json=Docs.parent_docs_json_format)
+    response = await ac.put('/family/add_parent', json=Docs.parent_docs_json_format)
     print("\n--- STATUS CODE ---", response.status_code)
     print("\n--- RESPONSE TEXT ---", response.text)
     print('\n-----JSON---------', response.json())# Показывает сырой ответ вместо падения

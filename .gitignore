@@ -11,3 +11,4 @@ finance_tracker_architecture.md
 ai_part/apikeys.txt
 test_report.json
 .vs/
+.env
